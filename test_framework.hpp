@@ -132,15 +132,15 @@ private:
         return os << ']';
     }
 
-#define OPEN_CONTAINER(cont)                                                                         \
-    template <class T>                                                                               \
-    static std::ostream &print_##cont(std::ostream &os, const std::cont<T> &q) {                     \
-        struct open_##cont : std::cont<T> {                                                          \
-            decltype(auto) get() {                                                                   \
-                return std::cont<T>::c;                                                              \
-            }                                                                                        \
-        };                                                                                           \
-        return print_container(os, static_cast<open_##cont &>(const_cast<std::cont<T> &>(q)).get()); \
+#define OPEN_CONTAINER(cont)                                                     \
+    template <class T>                                                           \
+    static std::ostream &print_##cont(std::ostream &os, const std::cont<T> &q) { \
+        struct open_##cont : std::cont<T> {                                      \
+            auto get() const {                                                   \
+                return std::cont<T>::c;                                          \
+            }                                                                    \
+        };                                                                       \
+        return print_container(os, static_cast<const open_##cont &>(q).get());   \
     }
 
     OPEN_CONTAINER(queue)
