@@ -244,24 +244,18 @@ void TestFramework::assert_equal(const T &t, const U &u, const std::string &hint
 
 } // namespace al
 
-#if !defined(FILE_NAME)
-#define FILE_NAME __FILE__
-#endif
-
-#define ASSERT_EQUAL(x, y)                                        \
-    do {                                                          \
-        std::ostringstream p_assert_os;                           \
-        p_assert_os << #x << " != " << #y << '\n'                 \
-                    << FILE_NAME << " : " << __LINE__;            \
-        al::TestFramework::assert_equal(x, y, p_assert_os.str()); \
+#define ASSERT_EQUAL(x, y)                                                                                   \
+    do {                                                                                                     \
+        al::TestFramework::assert_equal(                                                                     \
+            x, y, static_cast<std::ostringstream &>(                                                         \
+                std::ostringstream{} << #x << " != " << #y << '\n' << __FILE__ << " : " << __LINE__).str()); \
     } while (0)
 
-#define ASSERT(x)                                        \
-    do {                                                 \
-        std::ostringstream p_assert_os;                  \
-        p_assert_os << #x << " is false" << '\n'         \
-                    << FILE_NAME << " : " << __LINE__;   \
-        al::TestFramework::assert(x, p_assert_os.str()); \
+#define ASSERT(x)                                                                                          \
+    do {                                                                                                   \
+        al::TestFramework::assert(                                                                         \
+            x, static_cast<std::ostringstream &>(                                                          \
+                std::ostringstream{} << #x << " is false" << '\n' << __FILE__ << " : " << __LINE_).str()); \
     } while (0)
 
 #define RUN_TEST(func) run_test(func, #func)
