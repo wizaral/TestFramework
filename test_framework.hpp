@@ -227,4 +227,4 @@ private:
         assert(x, p_assert_os.str());            \
     } while (0)
 
-#define RUN_TEST(tr, func) tr.run_test(func, #func)
+#define RUN_TEST(func) run_test(func, #func)
