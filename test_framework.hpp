@@ -120,22 +120,22 @@ private:
         return false;
     }
 
+    template <class Container>
+    static std::ostream &print_container(std::ostream &os, const Container &cont) {
+        os << '[';
+
+        if (auto it = cont.begin(), end = cont.end(); it != end) {
+            for (os << *it, ++it; it != end; ++it) {
+                os << ", " << *it;
+            }
+        }
+        return os << ']';
+    }
+
     template <class T, std::size_t S>
     friend std::ostream &operator<<(std::ostream &os, const std::array<T, S> &array) {
         return print_container(os, array);
     }
-
-#define PRINT_MAP(map)                                                             \
-    template <class K, class V>                                                    \
-    friend std::ostream &operator<<(std::ostream &os, const std::map<K, V> &map) { \
-        return print_map(os, map);                                                 \
-    }
-
-    PRINT_MAP(map)
-    PRINT_MAP(multimap)
-    PRINT_MAP(unordered_map)
-    PRINT_MAP(unordered_multimap)
-#undef PRINT_MAP
 
 #define PRINT_CONTAINER(cont)                                                     \
     template <class T>                                                            \
@@ -152,6 +152,21 @@ private:
     PRINT_CONTAINER(unordered_set)
     PRINT_CONTAINER(unordered_multiset)
 #undef PRINT_CONTAINER
+
+#define OPEN_CONTAINER(cont)                                                                           \
+    template <class T>                                                                                 \
+    static std::ostream &print_##cont(std::ostream &os, const std::cont<T> &q) {                       \
+        struct open_##cont : std::cont<T> {                                                            \
+            decltype(auto) get_c() {                                                                   \
+                return std::cont<T>::c;                                                                \
+            }                                                                                          \
+        };                                                                                             \
+        return print_container(os, static_cast<open_##cont &>(const_cast<std::cont<T> &>(q)).get_c()); \
+    }
+
+    OPEN_CONTAINER(queue)
+    OPEN_CONTAINER(stack)
+#undef OPEN_CONTAINER
 
 #define PRINT_OPEN_CONTAINER(cont)                                                \
     template <class T>                                                            \
@@ -177,32 +192,17 @@ private:
         return os << ']';
     }
 
-    template <class Container>
-    static std::ostream &print_container(std::ostream &os, const Container &cont) {
-        os << '[';
-
-        if (auto it = cont.begin(), end = cont.end(); it != end) {
-            for (os << *it, ++it; it != end; ++it) {
-                os << ", " << *it;
-            }
-        }
-        return os << ']';
+#define PRINT_MAP(map)                                                             \
+    template <class K, class V>                                                    \
+    friend std::ostream &operator<<(std::ostream &os, const std::map<K, V> &map) { \
+        return print_map(os, map);                                                 \
     }
 
-#define OPEN_CONTAINER(cont)                                                                           \
-    template <class T>                                                                                 \
-    static std::ostream &print_##cont(std::ostream &os, const std::cont<T> &q) {                       \
-        struct open_##cont : std::cont<T> {                                                            \
-            decltype(auto) get_c() {                                                                   \
-                return std::cont<T>::c;                                                                \
-            }                                                                                          \
-        };                                                                                             \
-        return print_container(os, static_cast<open_##cont &>(const_cast<std::cont<T> &>(q)).get_c()); \
-    }
-
-    OPEN_CONTAINER(queue)
-    OPEN_CONTAINER(stack)
-#undef OPEN_CONTAINER
+    PRINT_MAP(map)
+    PRINT_MAP(multimap)
+    PRINT_MAP(unordered_map)
+    PRINT_MAP(unordered_multimap)
+#undef PRINT_MAP
 };
 
 } // namespace al
@@ -211,20 +211,20 @@ private:
 #define FILE_NAME __FILE__
 #endif
 
-#define ASSERT_EQUAL(x, y)                             \
-    do {                                               \
-        std::ostringstream p_assert_os;                \
-        p_assert_os << #x << " != " << #y << '\n'      \
-                    << FILE_NAME << " : " << __LINE__; \
-        assert_equal(x, y, p_assert_os.str());         \
+#define ASSERT_EQUAL(x, y)                        \
+    do {                                          \
+        std::ostringstream p_assert_os;           \
+        p_assert_os << #x << " != " << #y << '\n' \
+            << FILE_NAME << " : " << __LINE__;    \
+        assert_equal(x, y, p_assert_os.str());    \
     } while (0)
 
-#define ASSERT(x)                                      \
-    do {                                               \
-        std::ostringstream p_assert_os;                \
-        p_assert_os << #x << " is false" << '\n'       \
-                    << FILE_NAME << " : " << __LINE__; \
-        assert(x, p_assert_os.str());                  \
+#define ASSERT(x)                                \
+    do {                                         \
+        std::ostringstream p_assert_os;          \
+        p_assert_os << #x << " is false" << '\n' \
+            << FILE_NAME << " : " << __LINE__;   \
+        assert(x, p_assert_os.str());            \
     } while (0)
 
 #define RUN_TEST(tr, func) tr.run_test(func, #func)
