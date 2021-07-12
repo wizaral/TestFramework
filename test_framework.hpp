@@ -16,6 +16,8 @@
 #include <unordered_set>
 #include <vector>
 
+#include "profiler.hpp"
+
 namespace al {
 
 class TestFramework final {
@@ -29,7 +31,10 @@ public:
     template <class TestFunc>
     void run_test(TestFunc func, const std::string &test_name = {}) {
         try {
-            func();
+            {
+                LOG_DURATION(test_name);
+                func();
+            }
             std::cerr << test_name << " OK" << std::endl;
         } catch (std::exception &ex) {
             ++m_fails;
