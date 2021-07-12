@@ -16,7 +16,9 @@
 #include <unordered_set>
 #include <vector>
 
+#if defined(TEST_FRAMEWORK_PROFILER)
 #include "profiler.hpp"
+#endif
 
 namespace al {
 
@@ -32,7 +34,9 @@ public:
     void run_test(TestFunc func, const std::string &test_name = {}) {
         try {
             {
+#if defined(TEST_FRAMEWORK_PROFILER)
                 LOG_DURATION(test_name);
+#endif
                 func();
             }
             std::cerr << test_name << " OK" << std::endl;
