@@ -1,0 +1,3 @@
+[submodule "Profiler"]
+	path = Profiler
+	url = https://github.com/wizaral/Profiler
