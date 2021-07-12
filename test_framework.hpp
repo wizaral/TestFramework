@@ -192,6 +192,10 @@ private:
 #undef DECLARE_PRINT_MAP
 };
 
+std::ostream &operator<<(std::ostream &os, std::nullptr_t) {
+    return os << "nullptr";
+}
+
 template <class T, std::size_t S>
 std::ostream &operator<<(std::ostream &os, const std::array<T, S> &array) {
     return TestFramework::print_container(os, array);
