@@ -59,6 +59,11 @@ void test13() {
     TEST_MAP(unordered_multimap);
 }
 
+void test14() {
+    std::cerr << "Check std::ostream &operator<<(std::ostream &os, std::nullptr_t): ";
+    al::operator<<(std::cerr, nullptr) << std::endl;
+}
+
 int main() {
     al::TestFramework tf(false);
 
@@ -77,5 +82,6 @@ int main() {
         tf.RUN_TEST(test11), std::cerr << '\n';
         tf.RUN_TEST(test12), std::cerr << '\n';
         tf.RUN_TEST(test13), std::cerr << '\n';
+        tf.RUN_TEST(test14), std::cerr << '\n';
     }
 }
